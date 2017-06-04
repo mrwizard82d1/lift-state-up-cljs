@@ -8,15 +8,15 @@
 
 ;; define your app data so that it doesn't get over-written on reload
 
-(defonce app-state (atom {:text "Hello world!"}))
+(defonce app-state (atom {:temperature 50}))
 
 (om/root
   (fn [data owner]
     (reify om/IRender
       (render [_]
-        (dom/div nil
-                 (dom/h1 nil (:text data))
-                 (dom/h3 nil "Edit this and watch it change!")))))
+        (dom/p nil (if (>= (:temperature data) 100)
+                     "The water would boil."
+                     "The water would not boil.")))))
   app-state
   {:target (. js/document (getElementById "app"))})
 
