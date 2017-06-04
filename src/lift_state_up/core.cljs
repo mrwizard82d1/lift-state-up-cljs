@@ -8,11 +8,11 @@
 
 (defonce app-state (atom {}))
 
-(defn boiling-verdict [data owner]
+(defn boiling-verdict [{:keys [temperature]} owner]
   (reify 
     om/IRender
     (render [_]
-      (dom/p nil (if (>= data 100)
+      (dom/p nil (if (>= temperature 100)
                    "The water would boil."
                    "The water would not boil.")))))
 
@@ -20,14 +20,19 @@
   (reify
     om/IInitState
     (init-state [_]
-      (println "In `init-state`. app-state=" @app-state)
       {:temperature ""})
-    om/IRender
-    (render [_]
-      (println "In `render`. app-state=" @app-state)
+    om/IRenderState
+    (render-state [this state]
       (dom/fieldset nil
                (dom/legend nil "Enter the temperature in Celsius:")
-               (om/build boiling-verdict (:temperature data))))))
+               (dom/input #js {:type "number"
+                               :ref "new-contact"
+                               :value (:temperature state)
+                               :onChange (fn [e] 
+                                           (om/set-state! owner
+                                                          :temperature
+                                                          (.. e -target -value)))})
+               (om/build boiling-verdict state)))))
 
 (om/root calculator 
          app-state
